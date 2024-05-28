@@ -8,9 +8,14 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   // 🧠 Use Axios to GET learners and mentors.
   // ❗ Use the variables `mentors` and `learners` to store the data.
   // ❗ Use the await keyword when using axios.
+  // let url = `http://localhost:3003/api/learners?id=${5}`
+  // const res = await axios.get(url)
+  // console.log(res)
 
-  let mentors = [] // fix this
-  let learners = [] // fix this
+  let res = `http://localhost:3003/api/mentors?id+${3}` // fix this
+  let res2 = `http://localhost:3003/api/learners?id=${5}` // fix this
+  let learners = await axios.get(res2)
+  let mentors = await axios.get(res)
 
   // 👆 ==================== TASK 1 END ====================== 👆
 
@@ -29,6 +34,24 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   //   ]`
   // }
 
+for (let i = 0; i < learners.data.length; i++) {
+  learners.data[i].tempMentors = []
+
+  for (let j = 0; j < learners.data[i].mentors.length; j++) {
+
+    let foundmentor = mentors.data.find((element) => element.id === learners.data[i].mentors[j])
+    let mentor = `${foundmentor.firstName} ${foundmentor.lastName}`
+
+    learners.data[i].tempMentors.push(mentor)
+  }
+
+  learners.data[i].mentors = []
+  learners.data[i].mentors = learners.data[i].tempMentors
+
+  delete learners.data[i].tempMentors
+}
+
+
   // 👆 ==================== TASK 2 END ====================== 👆
 
   const cardsContainer = document.querySelector('.cards')
@@ -38,7 +61,7 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
 
   // 👇 ==================== TASK 3 START ==================== 👇
 
-  for (let learner of learners) { // looping over each learner object
+  for (let learner of learners.data) { // looping over each learner object
 
     // 🧠 Flesh out the elements that describe each learner
     // ❗ Give the elements below their (initial) classes, textContent and proper nesting.
@@ -48,10 +71,33 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
     // ❗ Inspect the mock site closely to understand what the initial texts and classes look like!
 
     const card = document.createElement('div')
+    card.setAttribute("class", "card")
     const heading = document.createElement('h3')
+      const learnerName = document.createTextNode(learner.fullName)
+      heading.appendChild(learnerName)
     const email = document.createElement('div')
+      const emailA = document.createTextNode(learner.email)
+      email.appendChild(emailA)
     const mentorsHeading = document.createElement('h4')
+      const mentorTitle = document.createTextNode('Mentors')
+      mentorsHeading.appendChild(mentorTitle)
+      mentorsHeading.setAttribute("class", "open")
+      mentorsHeading.addEventListener("click",
+        mentorsHeading.setAttribute("class", "closed")
+      )
     const mentorsList = document.createElement('ul')
+      for (let mentor of learner.mentors) {
+        let listItem = document.createElement('li')
+        const listItemText = document.createTextNode(mentor)
+        listItem.appendChild(listItemText)
+        mentorsList.appendChild(listItem)
+      }
+      mentorsHeading.appendChild(mentorsList)
+
+    card.appendChild(heading)
+    card.appendChild(email)
+    card.appendChild(mentorsHeading)
+  
 
     // 👆 ==================== TASK 3 END ====================== 👆
 
